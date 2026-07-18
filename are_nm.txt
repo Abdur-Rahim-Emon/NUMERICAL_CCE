@@ -426,3 +426,352 @@ print("\n===== FINAL SOLUTION =====")
 print(f"x = {x[0]:.3f}")
 print(f"y = {x[1]:.3f}")
 print(f"z = {x[2]:.3f}")
+
+
+
+9.Eulers method 
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def f(x, y):
+    return y - 0.5*np.exp(x/2)*np.sin(5*x) + 5*np.exp(x/2)*np.cos(5*x)
+
+def exact_solution(x):
+    return np.exp(x/2) * np.sin(5*x)
+
+def euler_method(f, x0, y0, h=0.1, n=100):
+    x_values = [x0]
+    y_values = [y0]
+
+    for i in range(n):
+        y0 = y0 + h * f(x0, y0)
+        x0 = x0 + h
+        x_values.append(x0)
+        y_values.append(y0)
+
+    return np.array(x_values), np.array(y_values)
+
+def solve_and_plot(x0, y0, h, t_end):
+    n = int(round((t_end - x0) / h))   # auto-calculate number of steps
+    x_values, y_values = euler_method(f, x0, y0, h, n)
+    exact_values = exact_solution(x_values)
+    error = np.abs(exact_values - y_values)
+    percent_error = np.where(exact_values != 0, (error / np.abs(exact_values)) * 100, 0)
+
+    print(f"{'n':<3}{'x_n':<8}{'y_n (Euler)':<15}{'Exact':<15}{'Error':<12}{'% Error':<10}")
+    print("-" * 65)
+    for i in range(len(x_values)):
+        print(f"{i:<3}{x_values[i]:<8.2f}{y_values[i]:<15.6f}"
+              f"{exact_values[i]:<15.6f}{error[i]:<12.6f}{percent_error[i]:<10.2f}")
+
+    print()
+    x_fine = np.linspace(x0, x_values[-1], 500)
+    y_fine_exact = exact_solution(x_fine)
+
+    plt.figure(figsize=(9, 6))
+    plt.plot(x_values, y_values, 'o--', label="Euler's Method", color='blue')
+    plt.plot(x_fine, y_fine_exact, label="Exact Solution", color='red')
+    plt.title(f"Euler's Method (x0={x0}, y0={y0}, h={h}, t_end={t_end})")
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    return x_values, y_values, exact_values, error, percent_error
+
+solve_and_plot (0,0,0.1,1)
+solve_and_plot (0,0,0.01,1)
+
+10.. simsons 1/3 and simsons 3/8 rule 
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import CubicSpline
+
+def fun(x):
+    return  (200*np.log(140000/(140000-2100*x)))-9.8*x
+
+def simpsons_1_3_rule(fun, a, b):
+    x0, x1, x2 = a, (a + b) / 2, b
+    y0, y1, y2 = fun(x0), fun(x1), fun(x2)
+    h = (b - a) / 2
+    result = (h / 3) * (y0 + 4*y1 + y2)
+
+    # Table
+    print("\nSimpson's 1/3 Rule")
+    print(f"{'i':<3}{'x_i':<10}{'f(x_i)':<12}{'Weight':<8}{'Weight*f(x_i)':<15}")
+    print("-" * 48)
+    labels = ['x0', 'x1', 'x2']
+    xs = [x0, x1, x2]
+    ys = [y0, y1, y2]
+    weights = [1, 4, 1]
+    for i in range(3):
+        print(f"{labels[i]:<3}{xs[i]:<10.4f}{ys[i]:<12.6f}{weights[i]:<8}{weights[i]*ys[i]:<15.6f}")
+    print("-" * 48)
+    print(f"Result = (h/3) * Σ(weight*f) = ({h:.4f}/3) * {sum(w*y for w,y in zip(weights, ys)):.6f} = {result:.6f}\n")
+
+    return result, xs, ys
+
+
+def simpsons_3_8_rule(fun, a, b):
+    a, b = min(a, b), max(a, b)
+    h = (b - a) / 3
+    x0, x1, x2, x3 = a, a+h, a+2*h, b
+    y0, y1, y2, y3 = fun(x0), fun(x1), fun(x2), fun(x3)
+    result = (3*h/8) * (y0 + 3*y1 + 3*y2 + y3)
+
+    # Table
+    print("\nSimpson's 3/8 Rule")
+    print(f"{'i':<3}{'x_i':<10}{'f(x_i)':<12}{'Weight':<8}{'Weight*f(x_i)':<15}")
+    print("-" * 48)
+    labels = ['x0', 'x1', 'x2', 'x3']
+    xs = [x0, x1, x2, x3]
+    ys = [y0, y1, y2, y3]
+    weights = [1, 3, 3, 1]
+    for i in range(4):
+        print(f"{labels[i]:<3}{xs[i]:<10.4f}{ys[i]:<12.6f}{weights[i]:<8}{weights[i]*ys[i]:<15.6f}")
+    print("-" * 48)
+    print(f"Result = (3h/8) * Σ(weight*f) = (3*{h:.4f}/8) * {sum(w*y for w,y in zip(weights, ys)):.6f} = {result:.6f}\n")
+
+    return result, xs, ys
+
+
+# --- Run both methods ---
+array = np.arange(-0.01, 0.82, 0.01)
+
+result_13, xs_13, ys_13 = simpsons_1_3_rule(fun, 8,15.33)
+print("Simpson's 1/3 Rule Final Value:", result_13)
+
+result_38, xs_38, ys_38 = simpsons_3_8_rule(fun, 15.33, 30)
+print("Simpson's 3/8 Rule Final Value:", result_38)
+
+
+
+# --- Plotting ---
+plt.plot(array, fun(array), label="f(x)")
+
+plt.scatter(xs_13, ys_13, color='green') ## making individuals dots of x1 x2 x3
+plt.plot(array, CubicSpline(xs_13, ys_13)(array), '--', color='red', label='Simpson 1/3 Rule')
+plt.fill_between(array, CubicSpline(xs_13, ys_13)(array), color='red', alpha=0.3)
+## simpsons 3/8 rule 
+plt.scatter(xs_38, ys_38, color='green')# for point in the grapgh
+plt.plot(array, CubicSpline(xs_38, ys_38)(array), '--', label="Simpson 3/8 Rule")
+plt.fill_between(array, CubicSpline(xs_38, ys_38)(array), alpha=0.3)
+
+plt.legend()
+plt.title("Simpson's 1/3 Rule vs Simpson's 3/8 Rule")
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.grid(True, alpha=0.3)
+plt.show()
+
+
+11.. trapizoidal rule 
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import quad
+
+def fun(x):
+    return (200 * np.log(140000 / (140000 - 2100 * x))) - 9.8 * x
+
+
+def trapezoidal_rule(fun, a, b):
+    return (b - a) * (fun(a) + fun(b)) / 2
+
+
+a, b = 8, 30
+
+# fine array for plotting a smooth curve
+array = np.arange(a, b + 0.01, 0.01)
+
+# ---- trapezoidal estimate ----
+S_approx = trapezoidal_rule(fun, a, b)
+
+# ---- true value (numerical integration, treated as "exact") ----
+S_true, _ = quad(fun, a, b)
+
+# ---- true error and absolute relative true error ----
+E_t = S_true - S_approx
+abs_rel_true_error = abs(E_t / S_true) * 100
+
+print("Trapezoidal estimate, S_approx =", S_approx)
+print("True value,          S_true   =", S_true)
+print("True error,          E_t      =", E_t)
+print("Absolute relative true error  =", abs_rel_true_error, "%")
+
+# ---- table of values ----
+t_table = np.arange(a, b + 1, 2)   # 8, 10, 12, ..., 30
+v_table = fun(t_table)
+
+print("\n t (s)   v(t) (m/s)")
+print("-" * 22)
+for ti, vi in zip(t_table, v_table):
+    print(f"{ti:6.0f}   {vi:10.4f}")
+
+# ---- plot ----
+plt.plot(array, fun(array), label="v(t) actual curve")
+plt.plot([a, b], [fun(a), fun(b)], 'o--', color='red',
+         label="Trapezoidal approximation")
+plt.scatter(t_table, v_table, color='blue', zorder=5, s=20)
+
+plt.xlabel("t (seconds)")
+plt.ylabel("v(t) (m/s)")
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()
+
+
+12.Milnes method 
+
+
+import matplotlib.pyplot as plt
+
+def fun_avg(x, y):
+    return (x + y) * 0.5
+
+def milnes_method(f, x0, x1, x2, x3, y0, y1, y2, y3, x4):
+    x = [x0, x1, x2, x3, x4]
+    y = [y0, y1, y2, y3, None]
+    h = x[1] - x[0]
+
+    # derivatives dy/dx at x1, x2, x3
+    y1_value = f(x[1], y[1])
+    y2_value = f(x[2], y[2])
+    y3_value = f(x[3], y[3])
+
+    # --- table of x, y, dy/dx ---
+    print(f"{'x':<8}{'y':<10}{'dy/dx':<10}")
+    print("-" * 26)
+    print(f"{x0:<8}{y0:<10}{'-':<10}")
+    print(f"{x1:<8}{y1:<10}{y1_value:<10.4f}")
+    print(f"{x2:<8}{y2:<10}{y2_value:<10.4f}")
+    print(f"{x3:<8}{y3:<10}{y3_value:<10.4f}")
+
+    # --- predictor ---
+    y4_predictor = y[0] + (4 * h / 3) * (2 * y1_value - y2_value + 2 * y3_value)
+    print(f"\nPredictor: y4 = {y4_predictor:.4f}")
+
+    # --- corrector ---
+    y4_value = f(x[4], y4_predictor)
+    y4_corrector = y[2] + (h / 3) * (y2_value + 4 * y3_value + y4_value)
+    print(f"Corrector: y4 = {y4_corrector:.4f}")
+
+    return y4_corrector
+
+
+x0, x1, x2, x3 = 0, 0.5, 1.0, 1.5
+y0, y1, y2, y3 = 2, 2.636, 3.595, 4.968
+
+final_y = milnes_method(fun_avg, x0, x1, x2, x3, y0, y1, y2, y3, x4=2)
+
+# --- plot ---
+plt.plot([x0, x1, x2, x3, 2], [y0, y1, y2, y3, final_y], marker='o', label="Milne's Method", color='green')
+plt.title("Milne's Method for Solving ODE")
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()
+
+13. Picards method 
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Third approximation
+def Y3(x):
+    return (
+        1
+        + (x)
+        + pow(x, 3) / 3
+        + pow(x, 4) / 4
+        + pow(x, 6) / 18
+        + pow(x, 7) / 28
+        + pow(x, 9) / 162
+    )
+
+def picard_method(f, x0, h=0.1, n=10, iterations=3):
+    x_values = np.arange(x0, x0 + n * h, h)
+    y_values = np.array([f(i) for i in x_values])
+
+    return x_values, y_values
+
+x_values, y_values = picard_method(f=Y3, x0=0, h=0.1)
+
+# --- show the results ---
+print(f"{'x':<8}{'y (3rd approximation)':<25}")
+print("-" * 33)
+for xi, yi in zip(x_values, y_values):
+    print(f"{xi:<8.1f}{yi:<25.6f}")
+
+plt.plot(x_values, y_values)
+plt.scatter(x_values[1], y_values[1], label=f'Point at x={x_values[1]:.1f}')
+plt.scatter(x_values[2], y_values[2], label=f'Point at x={x_values[2]:.1f}')
+plt.legend()
+plt.show()
+
+14. interpolation 
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = [1, 2,  3,  4]
+y = [1, 8, 27, 64]
+
+def forward(x, y, x_n):
+    arr = [y]
+    for i in range(3):## it means at 3 times del y =0 and (n-1)th zero and for function nth time zero
+        temp = []
+        for j in range(0, len(arr[-1])-1):
+            temp.append(arr[-1][j+1] - arr[-1][j])
+        arr.append(temp)
+    print("Forward difference table:", arr)
+
+    h = (x_n - x[0]) / (x[1] - x[0])
+    a = arr[0][0]
+    b = h * arr[1][0]
+    c = h * (h-1) / 2 * arr[2][0]
+    d = h * (h-1) * (h-2) / 6 * arr[3][0]
+
+    return a + b + c + d
+
+
+def backward(x, y, x_n):
+    arr = [y]
+    for i in range(3):
+        temp = []
+        for j in range(0, len(arr[-1])-1):
+            temp.append(arr[-1][j+1] - arr[-1][j])
+        arr.append(temp)
+    print("Backward difference table:", arr)
+
+    h = (x_n - x[-1]) / (x[1] - x[0])
+    a = arr[0][-1]                          # y_n
+    b = h * arr[1][-1]                      # p * ∇y_n
+    c = h * (h+1) / 2 * arr[2][-1]           # p(p+1)/2! * ∇²y_n
+    d = h * (h+1) * (h+2) / 6 * arr[3][-1]   # p(p+1)(p+2)/3! * ∇³y_n
+
+    return a + b + c + d
+
+
+def lagrange(x, y, x_n):
+    n = len(x)
+    res = 0
+    for i in range(n):
+        temp = y[i]
+        for j in range(n):
+            if i != j:
+                temp *= x_n - x[j]
+                temp /= x[i] - x[j]
+        res += temp
+    return res
+
+print("Forward:", forward(x, y, 2.5))
+print("Backward:", backward(x, y, 3.5))
+print("Lagrange:", lagrange(x, y, 2.5)) 2.5))
