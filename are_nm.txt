@@ -1,0 +1,428 @@
+1.Bisection 
+import matplotlib.pyplot as plt
+import numpy as np
+
+def false_position_method(f, a, b, tol=1e-5, max_iter=50):
+    if f(a) * f(b) >= 0:
+        raise ValueError("f(a) and f(b) must have opposite signs.")
+
+    print(f"{'Iter':<5}{'a':<10}{'b':<10}{'f(a)':<12}{'f(b)':<12}{'c':<10}{'f(c)':<12}{'Abs Error':<12}")
+    print("-" * 83)
+
+    c_old = None   # stores previous iteration's c, for error calculation
+
+    for i in range(1, max_iter + 1):
+        fa, fb = f(a), f(b)
+        c = b - (fb * (b - a)) / (fb - fa)
+        fc = f(c)
+
+        # Absolute error = |current c - previous c|
+        if c_old is None:
+            abs_error = float('nan')     # no previous value yet, on first iteration
+        else:
+            abs_error = abs(c - c_old)
+
+        print(f"{i:<5}{a:<10.6f}{b:<10.6f}{fa:<12.6f}{fb:<12.6f}{c:<10.6f}{fc:<12.6f}{abs_error:<12.6f}")
+
+        if abs(fc) < tol:
+            return c
+        elif fa * fc < 0:
+            b = c
+        else:
+            a = c
+
+        c_old = c   # save current c to compare with next iteration
+
+    return c
+
+# Simple function
+def f(x):
+    return ((668.061/x)*(1-np.exp(-0.1468*x)))-40
+
+root = false_position_method(f, 14, 16)
+print(f"\nApproximate root: {root:.6f}")
+
+# Plot
+x = np.arange(10, 20, 0.1)
+plt.plot(x, f(x))
+plt.axvline(root, color='red', linestyle='--', label=f'root ≈ {root:.5f}')
+plt.axhline(0, color='black', linewidth=0.5)
+plt.grid()
+plt.legend()
+plt.show()
+
+2.False Position :
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+def false_position_method(f, a, b, tol=1e-5, max_iter=50):
+    if f(a) * f(b) >= 0:
+        raise ValueError("f(a) and f(b) must have opposite signs.")
+
+    print(f"{'Iter':<5}{'a':<10}{'b':<10}{'f(a)':<12}{'f(b)':<12}{'c':<10}{'f(c)':<12}")
+    print("-" * 71)
+
+    for i in range(1, max_iter + 1):
+        fa, fb = f(a), f(b)
+        c = b - (fb * (b - a)) / (fb - fa)   # <-- False Position formula
+        fc = f(c)
+
+        print(f"{i:<5}{a:<10.6f}{b:<10.6f}{fa:<12.6f}{fb:<12.6f}{c:<10.6f}{fc:<12.6f}")
+
+        if abs(fc) < tol:
+            return c
+        elif fa * fc < 0:
+            b = c   # root is in [a, c]
+        else:
+            a = c   # root is in [c, b]
+
+    return c  # return best estimate if max_iter reached
+
+# Simple function
+def f(x):
+    return ((668.061/x)*(1-np.exp(-0.1468*x)))-40
+
+root = false_position_method(f, 14, 16)
+print(f"\nApproximate root: {root:.6f}")
+
+# Plot
+x = np.arange(10, 20, 0.1)     # <-- range fixed to match root's location
+plt.plot(x, f(x))
+plt.axvline(root, color='red', linestyle='--', label=f'root ≈ {root:.5f}')
+plt.axhline(0, color='black', linewidth=0.5)
+plt.grid()
+plt.legend()
+plt.show()
+
+3.Cramers Rule 
+
+import numpy as np
+
+arr = [
+    [2, 1, -1, 8],
+    [-3, -1, 2, -11],
+    [-2, 1, 2, -3]
+    ]
+
+main_array = np.array(arr)
+D = np.array(main_array[:,:-1])
+
+last_col  = np.array(main_array[:,-1])
+
+D1 = np.array([last_col, main_array[:,1], main_array[:,2]])
+D2 = np.array([main_array[:,0], last_col, main_array[:,2]])
+D3 = np.array([main_array[:,0], main_array[:,1], last_col])
+
+D_det = np.linalg.det(D)
+D1_det = np.linalg.det(D1)
+D2_det = np.linalg.det(D2)
+D3_det = np.linalg.det(D3)
+
+print("x = ", D1_det / D_det)
+print("y = ", D2_det / D_det)
+print("z = ", D3_det / D_det)
+
+4.Gause elimaination 
+
+N = 3
+arr = [[2, 3, 1, 1],
+        [4,7,5, 2], 
+        [6, 18, 6, 5]]
+
+def print_arr(arr):
+  for i in range(N):
+    print(arr[i])
+
+def gaussian_elimination(N, arr):
+  for i in range(N):
+    for j in range(N, -1, -1):
+      arr[i][j] /= arr[i][0+i] ## normalizing row by dividing pivot of the row 
+    
+    for j in range(i+1, N): ## eliminate the column i from rows below
+      for k in range(N, -1, -1):
+        arr[j][k] -= arr[i][k] * arr[j][0+i]
+
+    print_arr(arr)
+    print("answer\n")
+ ## back propagation step 
+  solve = [0 for j in range(N)]
+  for i in range(N-1, -1, -1):
+    for j in range(N):
+      solve[i] = arr[i][N]
+      for k in range(i+1, N):
+        solve[i] -= arr[i][k] * solve[k]
+    solve[i] /= arr[i][i]
+  print(solve)
+
+gaussian_elimination(N, arr)
+
+5.Jordan
+
+
+N = 3
+arr = [
+    [2, 3, 1, 1],
+    [4, 7, 5, 2],
+    [6,18, 6, 5]
+    ]
+
+def print_array(arr, N):
+    for i in range(N):
+        print(arr[i])
+
+def gauss_jordan(arr, N):
+    for i in range(N):
+        for j in range(N):
+            if i != j:
+                p = arr[j][i] / arr[i][i] ## divide the element by the  pivot 
+                for k in range(N+1):
+                    arr[j][k] -= arr[i][k] * p
+                    print_array(arr,N)
+                    print("\n")
+                    
+## solving part 
+    for i in range(N):
+        print(arr[i][3] / arr[i][i])
+
+print("Initial matrix : ")
+print_array(arr, N)
+
+print("Solution : ")
+gauss_jordan(arr, N)
+
+6.Iterarion : 
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Newton's Law of Cooling (steady state)
+# T = 25 + 0.85 * T * e^(-0.05T)
+
+def g(T):
+    return 25 + 0.85 * T * np.exp(-0.05 * T)
+
+def fixed_point_iteration(g, T0, tol=1e-6, max_iter=50):
+    print(f"{'Iter':<5}{'T':<15}{'g(T)':<15}{'Abs Error':<15}")
+    print("-" * 50)
+
+    T_values = [T0]
+    T_old = T0
+
+    for i in range(1, max_iter + 1):
+        T_next = g(T_old)
+        abs_error = abs(T_next - T_old)
+
+        print(f"{i:<5}{T_old:<15.6f}{T_next:<15.6f}{abs_error:<15.6f}")
+
+        T_values.append(T_next)
+
+        if abs_error < tol:
+            break
+
+        T_old = T_next
+
+    return T_values
+
+# Run the iteration
+T0 = 30.0
+T_values = fixed_point_iteration(g, T0)
+T_values = np.array(T_values)
+root = T_values[-1]
+
+print(f"\nConverged in {len(T_values)-1} iterations")
+print(f"Equilibrium Temperature = {root:.6f} °C")
+
+# Plot (styled like the false position graph)
+T_plot = np.linspace(20, 60, 300)
+plt.plot(T_plot, g(T_plot), label="y = g(T)")
+plt.plot(T_plot, T_plot, '--', label="y = T")
+plt.axvline(root, color='red', linestyle='--', label=f'Fixed point ≈ {root:.5f}')
+plt.axhline(root, color='black', linewidth=0.5)
+plt.grid()
+plt.legend()
+plt.show()
+
+7.Newton Rapson 
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# f(theta) = theta*cos(theta) - 0.2
+def f(theta):
+    return theta * np.cos(theta) - 0.2
+
+# f'(theta) = cos(theta) - theta*sin(theta)
+def f_prime(theta):
+    return np.cos(theta) - theta * np.sin(theta)
+
+def newton_raphson(f, f_prime, theta0, iterations=2):
+    print(f"{'Iter':<5}{'theta':<12}{'f(theta)':<14}{'fprime(theta)':<16}{'theta_new':<12}{'Abs Error':<12}")
+    print("-" * 71)
+
+    theta_old = theta0
+    theta_history = [theta0]   # store every theta for plotting the points
+
+    for i in range(1, iterations + 1):
+        f_val = f(theta_old)
+        fprime_val = f_prime(theta_old)
+
+        theta_new = theta_old - (f_val / fprime_val)
+        abs_error = abs(theta_new - theta_old)
+
+        print(f"{i:<5}{theta_old:<12.6f}{f_val:<14.6f}{fprime_val:<16.6f}{theta_new:<12.6f}{abs_error:<12.6f}")
+
+        theta_history.append(theta_new)
+        theta_old = theta_new
+
+    return theta_old, theta_history
+
+theta0 = 0.5
+root, theta_history = newton_raphson(f, f_prime, theta0, iterations=2)
+
+print(f"\ntheta after 2 iterations = {root:.3f} rad")
+
+# Plot
+theta_plot = np.linspace(-0.5, 1.5, 300)
+plt.plot(theta_plot, f(theta_plot), label="y = f(theta)")
+plt.axvline(root, color='red', linestyle='--', label=f'theta ≈ {root:.3f}')
+plt.axhline(0, color='black', linewidth=0.5)
+
+# mark each iteration's theta point on the curve
+for i, t in enumerate(theta_history):
+    plt.scatter(t, f(t), color='green', zorder=5)
+    plt.annotate(f"θ{i}", (t, f(t)), textcoords="offset points", xytext=(5,8), fontsize=8)
+
+plt.xlabel("theta (rad)")
+plt.ylabel("f(theta)")
+plt.title("Newton-Raphson: f(theta) = theta*cos(theta) - 0.2")
+plt.grid()
+plt.legend()
+plt.show()
+
+8.Cholesky :
+
+import numpy as np
+
+# ------------------------------------------------------
+# STEP 0: Original system of equations
+#   2x +  y -  z =  8
+#  -3x -  y + 2z = -11
+#  -2x +  y + 2z = -3
+# ------------------------------------------------------
+
+A = np.array([
+    [2, 1, -1],
+    [-3, -1, 2],
+    [-2, 1, 2]
+], dtype=float)
+
+b = np.array([8, -11, -3], dtype=float)
+
+N = 3   # number of unknowns (x, y, z)
+
+print("Original A matrix:")
+print(A)
+print("\nOriginal b vector:")
+print(b)
+
+# ------------------------------------------------------
+# STEP 1: Make the matrix symmetric
+# Cholesky ONLY works on symmetric matrices.
+# Our original A is not symmetric, so we convert the
+# problem using:  (A^T A) x = A^T b
+# ------------------------------------------------------
+
+ATA = A.T @ A     # A transpose multiplied by A
+ATb = A.T @ b     # A transpose multiplied by b
+
+print("\nA^T A (this is symmetric now):")
+print(ATA)
+print("\nA^T b:")
+print(ATb)
+
+# ------------------------------------------------------
+# STEP 2: Cholesky Decomposition
+# Breaks ATA into L (lower triangular matrix) such that:
+#     ATA = L * L^T
+# ------------------------------------------------------
+
+def cholesky_decomposition(M, N):
+    L = np.zeros((N, N))   # start with all zeros
+
+    for i in range(N):
+        for j in range(i + 1):
+
+            if i == j:
+                # ----- Diagonal element -----
+                # Formula: L[i][i] = sqrt( M[i][i] - sum(L[i][k]^2) )
+                total = 0
+                for k in range(j):
+                    total += L[i][k] ** 2
+                L[i][j] = np.sqrt(M[i][i] - total)
+
+            else:
+                # ----- Off-diagonal element -----
+                # Formula: L[i][j] = ( M[i][j] - sum(L[i][k]*L[j][k]) ) / L[j][j]
+                total = 0
+                for k in range(j):
+                    total += L[i][k] * L[j][k]
+                L[i][j] = (M[i][j] - total) / L[j][j]
+
+    return L
+
+L = cholesky_decomposition(ATA, N)
+
+print("\nL matrix (lower triangular):")
+print(L)
+
+print("\nCheck: L @ L.T should equal A^T A")
+print(L @ L.T)
+
+# ------------------------------------------------------
+# STEP 3: Forward Substitution
+# Solve:  L y = A^T b   (solve top to bottom)
+# ------------------------------------------------------
+
+def forward_substitution(L, c, N):
+    y = np.zeros(N)
+
+    for i in range(N):
+        total = 0
+        for k in range(i):
+            total += L[i][k] * y[k]
+        y[i] = (c[i] - total) / L[i][i]
+
+    return y
+
+y = forward_substitution(L, ATb, N)
+
+print("\ny values (from forward substitution):")
+print(y)
+
+# ------------------------------------------------------
+# STEP 4: Back Substitution
+# Solve:  L^T x = y   (solve bottom to top)
+# ------------------------------------------------------
+
+def back_substitution(L, y, N):
+    x = np.zeros(N)
+
+    for i in range(N - 1, -1, -1):
+        total = 0
+        for k in range(i + 1, N):
+            total += L[k][i] * x[k]
+        x[i] = (y[i] - total) / L[i][i]
+
+    return x
+
+x = back_substitution(L, y, N)
+
+# ------------------------------------------------------
+# FINAL ANSWER
+# ------------------------------------------------------
+
+print("\n===== FINAL SOLUTION =====")
+print(f"x = {x[0]:.3f}")
+print(f"y = {x[1]:.3f}")
+print(f"z = {x[2]:.3f}")
