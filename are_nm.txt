@@ -775,3 +775,743 @@ def lagrange(x, y, x_n):
 print("Forward:", forward(x, y, 2.5))
 print("Backward:", backward(x, y, 3.5))
 print("Lagrange:", lagrange(x, y, 2.5)) 2.5))
+
+15.polynomial 
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Sample data
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([2.2, 6.1, 14.5, 29.8, 51.2])
+
+# Fit a degree-3 polynomial
+coeffs = np.polyfit(x, y, deg=1)
+print("Coefficients (a, b, c, d):", coeffs)
+
+# Build the polynomial function
+p = np.poly1d(coeffs)
+print("Polynomial:", p)
+
+# Predict y for a new x value
+x_new = 6
+y_pred = p(x_new)
+print(f"Predicted y at x={x_new}: {y_pred:.2f}")
+
+
+
+x_smooth = np.linspace(min(x)-0.5, max(x)+1.5, 200)
+y_smooth = p(x_smooth)
+
+plt.scatter(x, y, color='red', label='Original data points')
+plt.plot(x_smooth, y_smooth, color='blue', label='Cubic fit')
+plt.scatter([6], [p(6)], color='green', marker='*', s=150, label='Prediction at x=6')
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+or
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+# ---- Auto-create CSV in the same folder as this script ----
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, "sample_data.csv")
+
+sample = pd.DataFrame({
+    "x": [1, 2, 3, 4, 5],
+    "y": [2.2, 6.1, 14.5, 29.8, 51.2]
+})
+sample.to_csv(csv_path, index=False)
+
+# ---- Read data from CSV ----
+data = pd.read_csv(csv_path)
+x = data["x"].values
+y = data["y"].values
+
+# ---- Fit polynomial ----
+deg = 1
+coeffs = np.polyfit(x, y, deg=deg)
+print("Coefficients:", coeffs)
+
+p = np.poly1d(coeffs)
+print("Polynomial:", p)
+
+x_new = 6
+y_pred = p(x_new)
+print(f"Predicted y at x={x_new}: {y_pred:.2f}")
+
+x_smooth = np.linspace(min(x)-0.5, max(x)+1.5, 200)
+y_smooth = p(x_smooth)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(x, y, color='red', label='Original data points (from CSV)')
+plt.plot(x_smooth, y_smooth, color='blue', label=f'Degree {deg} fit')
+plt.scatter([x_new], [y_pred], color='green', marker='*', s=150, label=f'Prediction at x={x_new}')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title(f'Polynomial Regression (Degree {deg}) from CSV Data')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
+or 
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+# Get the folder where this script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, "rui_fish_dataset.csv")
+
+# Read the CSV
+data = pd.read_csv(csv_path)
+x = data["Age"].values
+y = data["Length_mm"].values
+
+# ---- Fit polynomial ----
+deg = 3
+coeffs = np.polyfit(x, y, deg=deg)
+print("Coefficients:", coeffs)
+
+p = np.poly1d(coeffs)
+print("Polynomial:", p)
+
+x_new = 6
+y_pred = p(x_new)
+print(f"Predicted y at x={x_new}: {y_pred:.2f}")
+y_fit = p(x)
+
+mse = np.mean((y - y_fit) ** 2)
+rmse = np.sqrt(mse)
+
+ss_total = np.sum((y - np.mean(y)) ** 2)
+ss_res = np.sum((y - y_fit) ** 2)
+r2 = 1 - ss_res / ss_total
+
+print(f"MSE  = {mse:.3f}")
+print(f"RMSE = {rmse:.3f}")
+print(f"R²   = {r2:.4f}")
+x_smooth = np.linspace(min(x)-0.5, max(x)+1.5, 200)
+y_smooth = p(x_smooth)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(x, y, color='red', label='Original data points (from CSV)')
+plt.plot(x_smooth, y_smooth, color='blue', label=f'Degree {deg} fit')
+plt.scatter([x_new], [y_pred], color='green', marker='*', s=150, label=f'Prediction at x={x_new}')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title(f'Polynomial Regression (Degree {deg}) from CSV Data')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+or 
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+# Get the folder where this script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, "rui_fish_dataset.csv")
+
+# Read the CSV
+data = pd.read_csv(csv_path)
+x = data["Age"].values
+y = data["Length_mm"].values
+
+# ---- Fit polynomial ----
+deg = 3
+coeffs = np.polyfit(x, y, deg=deg)
+print("Coefficients:", coeffs)
+
+p = np.poly1d(coeffs)
+print("Polynomial:", p)
+
+x_new = int(input("enter input data point: "))
+y_pred = p(x_new)
+print(f"Predicted y at x={x_new}: {y_pred:.2f}")
+y_fit = p(x)
+
+mse = np.mean((y - y_fit) ** 2)
+rmse = np.sqrt(mse)
+
+ss_total = np.sum((y - np.mean(y)) ** 2)
+ss_res = np.sum((y - y_fit) ** 2)
+r2 = 1 - ss_res / ss_total
+
+print(f"MSE  = {mse:.3f}")
+print(f"RMSE = {rmse:.3f}")
+print(f"R²   = {r2:.4f}")
+x_smooth = np.linspace(min(x)-0.5, max(x)+1.5, 200)
+y_smooth = p(x_smooth)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(x, y, color='red', label='Original data points (from CSV)')
+plt.plot(x_smooth, y_smooth, color='blue', label=f'Degree {deg} fit')
+plt.scatter([x_new], [y_pred], color='green', marker='*', s=150, label=f'Prediction at x={x_new}')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title(f'Polynomial Regression (Degree {deg}) from CSV Data')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+17. polynomial fin
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+# Get the folder where this script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, "sample_data.csv")
+
+# Read the CSV
+data = pd.read_csv(csv_path)
+x = data["x"].values
+y = data["y"].values
+"""
+manual input data
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([2.2, 6.1, 14.5, 29.8, 51.2])
+"""
+# ---- Fit polynomial ----
+deg =  int(input("Enter polynomial degree: "))
+coeffs = np.polyfit(x, y, deg=deg)
+print("Coefficients:", coeffs)
+
+p = np.poly1d(coeffs)
+print("Polynomial:", p)
+
+x_new = int(input("enter input data point: "))
+y_pred = p(x_new)
+print(f"Predicted y at x={x_new}: {y_pred:.2f}")
+y_fit = p(x)
+
+mse = np.mean((y - y_fit) ** 2)
+rmse = np.sqrt(mse)
+
+ss_total = np.sum((y - np.mean(y)) ** 2)
+ss_res = np.sum((y - y_fit) ** 2)
+r2 = 1 - ss_res / ss_total
+
+print(f"MSE  = {mse:.3f}")
+print(f"RMSE = {rmse:.3f}")
+print(f"R²   = {r2:.4f}")
+x_smooth = np.linspace(min(x)-0.5, max(x)+1.5, 200)
+y_smooth = p(x_smooth)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(x, y, color='red', label='Original data points (from CSV)')
+plt.plot(x_smooth, y_smooth, color='blue', label=f'Degree {deg} fit')
+plt.scatter([x_new], [y_pred], color='green', marker='*', s=150, label=f'Prediction at x={x_new}')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title(f'Polynomial Regression (Degree {deg}) from CSV Data')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+or 
+
+18.. linear regression or least square regression
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+"""
+manual input data
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([2.2, 6.1, 14.5, 29.8, 51.2])
+"""
+script_dir = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(script_dir, "sample_data.csv")
+
+data = pd.read_csv(csv_path)
+
+x = data["x"].values.reshape(-1, 1)
+y = data["y"].values.reshape(-1, 1)
+def gradient_descent(x, y, m=0, b=0, learning_rate=0.01, epochs=10000):
+    n = len(y)#coutn the trainning samples
+    for epoch in range(epochs):
+        # Predict y
+        y_pred = m * x + b
+
+        # Calculate gradients
+        dm = (-2 / n) * np.sum(x * (y - y_pred))
+        db = (-2 / n) * np.sum(y - y_pred)
+
+        m = m - learning_rate * dm
+        b = b - learning_rate * db
+    return m, b
+
+m, b = gradient_descent(x, y)
+#output 
+
+print("\n========== MODEL TRAINED ==========")
+print(f"Slope (m)      : {m:.4f}")
+print(f"Intercept (b)  : {b:.4f}")
+print(f"Model Equation : y = {m:.4f}x + {b:.4f}")
+#sample test
+
+x_input = float(input("\nEnter the value of X: "))
+
+y_prediction = m * x_input + b
+
+print("----------------------------------")
+print(f"For X = {x_input}")
+print(f"Predicted Y = {y_prediction:.4f}")
+print("----------------------------------")
+
+y_pred = m * x + b
+
+#plot
+plt.figure(figsize=(8, 5))#sset height , weight
+
+plt.scatter(x, y, color="blue", label="Training Data")## plot input 
+#plot the output
+plt.plot(x, y_pred, color="red", linewidth=0.9, label="Regression Line")
+
+# Show the user's prediction
+plt.scatter(x_input, y_prediction, color="green", s=120,
+            label=f"Prediction ({x_input}, {y_prediction:.2f})")
+
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title("Linear Regression using Gradient Descent")
+plt.legend()
+plt.grid(True)
+
+plt.show()
+
+
+
+or 
+(less)
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Generate sample data
+np.random.seed(0)
+x = 2 * np.random.rand(100, 1)
+y = 4 + 3 * x + np.random.randn(100, 1)
+
+# Gradient Descent Function
+def gradient_descent(x, y, m=0, b=0, learning_rate=0.01, epochs=10000):
+    n = len(y)
+
+    for _ in range(epochs):
+        # Predict y
+        y_pred = m * x + b
+
+        # Calculate gradients
+        dm = (-2 / n) * np.sum(x * (y - y_pred))
+        db = (-2 / n) * np.sum(y - y_pred)
+
+        # Update parameters
+        m -= learning_rate * dm
+        b -= learning_rate * db
+
+    return m, b
+
+# Plot the original data
+plt.scatter(x, y, label="Data")
+
+# Train the model
+m, b = gradient_descent(x, y)
+
+# Print the final values
+print("Final Parameters")
+print("----------------")
+print(f"Slope (m)      = {m:.4f}")
+print(f"Intercept (b)  = {b:.4f}")
+print(f"Equation       = y = {m:.4f}x + {b:.4f}")
+
+# Plot the regression line
+plt.plot(x, m * x + b, color='red', linewidth=2, label="Regression Line")
+
+# Labels and title
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title("Linear Regression using Gradient Descent")
+plt.legend()
+
+# Show the plot
+plt.show()
+
+20.Multiple regression 
+
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+X = np.array([
+    [1000, 2, 1],
+    [1200, 3, 2],
+    [1500, 3, 3],
+    [1700, 4, 3],
+    [850,  2, 1],
+    [1400, 3, 2],
+    [2000, 5, 3]
+])
+
+# Price (Lakh BDT)
+y = np.array([30, 45, 65, 75, 25, 55, 95])
+
+model = LinearRegression()
+model.fit(X, y)
+
+# -----------------------------
+# Get Equation
+# -----------------------------
+intercept = model.intercept_
+coef = model.coef_
+
+print("Final Equation:\n")
+print(f"Price = {intercept:.2f}"
+      f" + ({coef[0]:.4f} × Area)"
+      f" + ({coef[1]:.4f} × Rooms)"
+      f" + ({coef[2]:.4f} × LocationCode)")
+
+# -----------------------------
+# Take User Input
+# -----------------------------
+print("\nEnter House Information")
+
+area = float(input("Area (sq ft): "))
+rooms = float(input("Number of Rooms: "))
+location = int(input("Location (1=Rural, 2=Suburban, 3=Urban): "))
+
+new_house = np.array([[area, rooms, location]])
+
+predicted_price = model.predict(new_house)
+
+print(f"\nPredicted House Price = {predicted_price[0]:.2f} Lakh BDT")
+
+# -----------------------------
+# Actual vs Predicted
+# -----------------------------
+y_pred = model.predict(X)
+
+plt.figure(figsize=(6,6))
+plt.scatter(y, y_pred, color="blue", s=80)
+
+min_val = min(y.min(), y_pred.min())
+max_val = max(y.max(), y_pred.max())
+
+plt.plot([min_val, max_val],
+         [min_val, max_val],
+         "r--")
+
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual vs Predicted House Price")
+plt.grid(True)
+plt.show()
+
+or (sample data)
+
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+import os
+
+# ---------------------------------
+# Read CSV File
+# ---------------------------------
+
+# Get current script folder
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# CSV file path
+csv_path = os.path.join(script_dir, "house_data.csv")
+
+# Read CSV
+data = pd.read_csv(csv_path)
+
+# ---------------------------------
+# Select Features (X) and Target (y)
+# ---------------------------------
+
+X = data[["Area", "Rooms", "Location"]].values
+y = data["Price"].values
+
+# ---------------------------------
+# Train Model
+# ---------------------------------
+
+model = LinearRegression()
+model.fit(X, y)
+
+# ---------------------------------
+# Get Equation
+# ---------------------------------
+
+intercept = model.intercept_
+coef = model.coef_
+
+print("\nFinal Equation:\n")
+
+print(f"Price = {intercept:.2f}"
+      f" + ({coef[0]:.4f} × Area)"
+      f" + ({coef[1]:.4f} × Rooms)"
+      f" + ({coef[2]:.4f} × Location)")
+
+# ---------------------------------
+# User Input
+# ---------------------------------
+
+print("\nEnter House Information")
+
+area = float(input("Area (sq ft): "))
+rooms = float(input("Number of Rooms: "))
+location = int(input("Location (1=Rural, 2=Suburban, 3=Urban): "))
+
+new_house = np.array([[area, rooms, location]])
+
+predicted_price = model.predict(new_house)
+
+print(f"\nPredicted House Price = {predicted_price[0]:.2f} Lakh BDT")
+
+# ---------------------------------
+# Predict Training Data
+# ---------------------------------
+
+y_pred = model.predict(X)
+
+# ---------------------------------
+# Plot
+# ---------------------------------
+
+plt.figure(figsize=(6,6))
+plt.scatter(y, y_pred, color="blue", s=80)
+
+min_val = min(y.min(), y_pred.min())
+max_val = max(y.max(), y_pred.max())
+
+plt.plot([min_val, max_val],
+         [min_val, max_val],
+         "r--",
+         linewidth=2)
+
+plt.xlabel("Actual Price (Lakh BDT)")
+plt.ylabel("Predicted Price (Lakh BDT)")
+plt.title("Actual vs Predicted House Price")
+plt.grid(True)
+
+plt.show()
+
+20.Taylor series
+
+import numpy as np
+
+
+def y1(x, y):
+    return y - x**3
+
+def y2(x, y):
+    return y - x**3 - 3*x**2
+
+def y3(x, y):
+    return y - x**3 - 3*x**2 - 6*x
+
+def y4(x, y):
+    return y - x**3 - 3*x**2 - 6*x - 6
+
+
+# ---------------------------------------
+# Taylor Series Method
+# ---------------------------------------
+
+def taylor_method(x0, y0, h, steps):
+
+    x = x0
+    y = y0
+
+    print("x\t\t y")
+    print("----------------------")
+    print(f"{x:.1f}\t\t{y:.6f}")
+
+    for i in range(steps):
+
+        dy1 = y1(x, y)
+        dy2 = y2(x, y)
+        dy3 = y3(x, y)
+        dy4 = y4(x, y)
+
+        y = (y
+             + h*dy1
+             + (h**2/2)*dy2
+             + (h**3/6)*dy3
+             + (h**4/24)*dy4)
+
+        x = x + h
+
+        print(f"{x:.1f}\t\t{y:.6f}")
+
+
+x0 = 0
+y0 = 1
+h = 0.1
+steps = 3
+
+taylor_method(x0, y0, h, steps)
+or 
+
+import matplotlib.pyplot as plt
+
+# ---------------------------------------
+# Differential Equation
+# dy/dx = y - x^3
+# ---------------------------------------
+
+def f(x, y):
+    return y - x**3
+
+
+# ---------------------------------------
+# Taylor Series Derivatives
+# ---------------------------------------
+
+def y1(x, y):
+    return y - x**3
+
+def y2(x, y):
+    return y - x**3 - 3*x**2
+
+def y3(x, y):
+    return y - x**3 - 3*x**2 - 6*x
+
+def y4(x, y):
+    return y - x**3 - 3*x**2 - 6*x - 6
+
+
+# ---------------------------------------
+# Taylor Series Method
+# ---------------------------------------
+
+def taylor_method(x0, y0, h, steps):
+
+    x_values = [x0]
+    y_values = [y0]
+
+    print("\nTaylor Series")
+    print("-"*30)
+    print("x\t\t y")
+    print("-"*30)
+    print(f"{x0:.1f}\t\t{y0:.6f}")
+
+    x = x0
+    y = y0
+
+    for i in range(steps):
+
+        y = (y
+             + h*y1(x, y)
+             + (h**2/2)*y2(x, y)
+             + (h**3/6)*y3(x, y)
+             + (h**4/24)*y4(x, y))
+
+        x += h
+
+        x_values.append(x)
+        y_values.append(y)
+
+        print(f"{x:.1f}\t\t{y:.6f}")
+
+    return x_values, y_values
+
+
+# ---------------------------------------
+# Milne Predictor-Corrector
+# ---------------------------------------
+
+def milne_method(x, y, h):
+
+    f0 = f(x[0], y[0])
+    f1 = f(x[1], y[1])
+    f2 = f(x[2], y[2])
+    f3 = f(x[3], y[3])
+
+    print("\nDerivative Table")
+    print("-"*40)
+    print("x\t\t y\t\t f(x,y)")
+    print("-"*40)
+
+    for i in range(4):
+        print(f"{x[i]:.1f}\t\t{y[i]:.6f}\t{f(x[i],y[i]):.6f}")
+
+    # Predictor
+    yp = y[0] + (4*h/3)*(2*f1 - f2 + 2*f3)
+
+    x4 = x[3] + h
+    fp = f(x4, yp)
+
+    # Corrector
+    yc = y[2] + (h/3)*(f2 + 4*f3 + fp)
+
+    print("\nMilne Predictor")
+    print("------------------------")
+    print(f"y({x4:.1f}) = {yp:.6f}")
+
+    print("\nMilne Corrector")
+    print("------------------------")
+    print(f"y({x4:.1f}) = {yc:.6f}")
+
+    return x4, yc
+
+
+# ---------------------------------------
+# Main Program
+# ---------------------------------------
+
+h = 0.1
+
+# Taylor gives y(0.1), y(0.2), y(0.3)
+x, y = taylor_method(0, 1, h, 3)
+
+# Milne finds y(0.4)
+x4, y4 = milne_method(x, y, h)
+
+# Store new point
+x.append(x4)
+y.append(y4)
+
+# ---------------------------------------
+# Plot
+# ---------------------------------------
+
+plt.figure(figsize=(7,5))
+
+plt.plot(x, y, marker='o', linewidth=2)
+
+plt.title("Taylor Series + Milne Predictor-Corrector")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.grid(True)
+
+plt.show()
